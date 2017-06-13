@@ -16,6 +16,13 @@ class HIDButtons(IntFlag):
 	X = auto()
 	Y = auto()
 
+class CPAD_Commands(IntFlag):
+	CPADUP = auto()
+	CPADDOWN = auto()
+	CPADLEFT	= auto()
+	CPADRIGHT = auto()
+	CPADNEUTRAL = auto() #sets cpad to 0,0
+
 
 
 def bytearray_not(arr):
@@ -27,7 +34,10 @@ class LumaInputServer():
 		port = 4950
 		self.socket.connect((server, port))
 
+		self.CPAD_BOUND = 0x5d0
+
 		self.current_pressed_buttons = HIDButtons.A ^ HIDButtons.A #no buttons
+		self.circle_pad_coords = [0,0] #0,0 is the center
 
 		#button-pressing functions
 		#these do nothing until self.send() is called.
@@ -39,22 +49,44 @@ class LumaInputServer():
 		if button in self.current_pressed_buttons:
 			self.current_pressed_buttons ^= button
 
+	def circle_pad_set(self, button, multiplier=1):
+		if button == CPAD_Commands.CPADUP:
+			self.circle_pad_coords[1] = 32767*multiplier
+		if button == CPAD_Commands.CPADDOWN:
+			self.circle_pad_coords[1] = -32767*multiplier
+		if button == CPAD_Commands.CPADLEFT:
+			self.circle_pad_coords[0] = -32767*multiplier
+		if button == CPAD_Commands.CPADRIGHT:
+			self.circle_pad_coords[0] = 32767*multiplier
+		if button == CPAD_Commands.CPADNEUTRAL: #resets cpad
+			self.circle_pad_coords = [0,0]
+
+	def circle_pad_neutral(self):
+		self.circle_pad_coords = [0,0]
+
 	def hid_toggle(self, button):
 		self.current_pressed_buttons ^= button
 
 	def send(self):
-		circle_state = bytearray.fromhex("007ff7ff")
+		circle_state = bytearray.fromhex("7ff7ff00")
 		cstick_state = bytearray.fromhex("80800081")
-		touch_state =  bytearray.fromhex("02000000");
+		touch_state =  bytearray.fromhex("20000000")
 		special_buttons = bytearray(4)
 
 		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
 		hid_state = bytearray_not(hid_buttons)
 
+		if self.circle_pad_coords[0] != 0 or self.circle_pad_coords != 0: # "0x5d0 is the upper/lower bound of circle pad input", says stary2001
+			x,y = self.circle_pad_coords
+			x = ((x * self.CPAD_BOUND) // 32768) + 2048
+			y = ((y * self.CPAD_BOUND) // 32768) + 2048
+			circle_state = x | (y << 12)
+			print(circle_state)
+
 		toSend = bytearray(20) #create empty byte array
 		toSend[0:4] = hid_state
 		toSend[4:8] = touch_state
-		toSend[8:12] = circle_state
+		toSend[8:12] = circle_state.to_bytes(4,byteorder='little')
 		toSend[12:16] = cstick_state
 		toSend[16:20] = special_buttons
 		print(toSend)
