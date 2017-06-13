@@ -1,5 +1,5 @@
 import sys, time
-from lumainput import *
+from tppflush import *
 
 if len(sys.argv) < 2:
 	print("To run as an executable: python3 lumainput.py <3ds ip>")
