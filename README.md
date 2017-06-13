@@ -17,21 +17,19 @@ Not yet supported:
 	* N3DS ZR and ZL
 	* Home and power buttons
 
-## How do I use it in my own python application?
+## If I'm a developer, how do I use TPPFLUSH in my own python application?
 
 After importing `tppflush`, Create a `LumaInputServer` with the IP of the target 3DS, then call various functions with the appropriate enum of the button you want as appropriate to change the internal state, and finally call `send()` to send the input to the 3DS. *Nothing will happen unless `send()` is called!*
 
-## How do I connect this to a 3DS?
+## How do I connect TPPFLUSH to a 3DS?
 
 First, find the IP of your 3DS - FTP applications are useful for figuring this out. Activate input redirection via the rosalina menu (L+down+select -> Miscellaneous options... -> InputRedirection). Finally, run `interactive_buttons.py <3DS IP>` to connect, then type 'A' and press enter to push the A button on the DS.
 
 ## I'm not a developer; is this useful to me?
 
-Probably not, but if you really want to, there are some examples. See interactive_buttons.py for a bare-bones client that works on all platforms, not just windows.
+Yes! If you want to control your 3DS from a computer, run interactive_buttons.py for a bare-bones client that works on all platforms, not just windows.
 
-## Why is the circle pad inputting such an odd angle?
-
-This is very much a work in progress.
+As of June 12, 2017, TPPFLUSH is the only client that works for linux without requiring compiliation. 
 
 ## Credits
 
