@@ -1,24 +1,6 @@
 import socket #imports module allowing connection to IRC
 from enum import IntFlag, auto
 
-import sys
-
-if len(sys.argv) < 2:
-	print("Usage: python3 lumainput.py <3ds ip>")
-	quit()
-
-server = sys.argv[1]
-
-tsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-port = 4950
-tsocket.connect((server, port))
-
-circle_state = bytearray.fromhex("007ff7ff")
-cstick_state = bytearray.fromhex("80800081")
-touch_state =  bytearray.fromhex("02000000");
-special_buttons = bytearray(4)
-hid_buttons =  bytearray.fromhex("fffff000")
-hid_state = bytearray.fromhex("fefff000")
 
 class HIDButtons(IntFlag):
 	A = auto()
@@ -34,23 +16,49 @@ class HIDButtons(IntFlag):
 	X = auto()
 	Y = auto()
 
-current_pressed_buttons = HIDButtons.A ^ HIDButtons.A #no buttons
 
-def hid_press(button):
-	global current_pressed_buttons
-	if button not in current_pressed_buttons:
-		current_pressed_buttons |= button
-	print(current_pressed_buttons)
 
-def hid_unpress(button):
-	global current_pressed_buttons
-	if button in current_pressed_buttons:
-		current_pressed_buttons ^= button
-	print(current_pressed_buttons)
+def bytearray_not(arr):
+	return bytearray([255-i for i in arr])
 
-def hid_toggle(button):
-	global current_pressed_buttons
-	current_pressed_buttons ^= button
+class LumaInputServer():
+	def __init__(self, server, port=4950):
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		port = 4950
+		self.socket.connect((server, port))
+
+		self.current_pressed_buttons = HIDButtons.A ^ HIDButtons.A #no buttons
+
+		#button-pressing functions
+		#these do nothing until self.send() is called.
+	def hid_press(self, button):
+		if button not in self.current_pressed_buttons:
+			self.current_pressed_buttons |= button
+
+	def hid_unpress(self, button):
+		if button in self.current_pressed_buttons:
+			self.current_pressed_buttons ^= button
+
+	def hid_toggle(self, button):
+		self.current_pressed_buttons ^= button
+
+	def send(self):
+		circle_state = bytearray.fromhex("007ff7ff")
+		cstick_state = bytearray.fromhex("80800081")
+		touch_state =  bytearray.fromhex("02000000");
+		special_buttons = bytearray(4)
+
+		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
+		hid_state = bytearray_not(hid_buttons)
+
+		toSend = bytearray(20) #create empty byte array
+		toSend[0:4] = hid_state
+		toSend[4:8] = touch_state
+		toSend[8:12] = circle_state
+		toSend[12:16] = cstick_state
+		toSend[16:20] = special_buttons
+		print(toSend)
+		self.socket.send(toSend)
 
 """
 	if(circle_x != 0 || circle_y != 0) // Do circle magic. 0x5d0 is the upper/lower bound of circle pad input
@@ -83,15 +91,16 @@ def hid_toggle(button):
 		touch_state = x | (y << 12) | (0x01 << 24);
 }"""
 
-def send():
-	toSend = bytearray(20) #create empty byte array
-	toSend[0:4] = hid_state
-	toSend[4:8] = touch_state
-	toSend[8:12] = circle_state
-	toSend[12:16] = cstick_state
-	toSend[16:20] = special_buttons
-	print(toSend)
-	tsocket.send(toSend)
+if __name__ == "__main__":
+	import sys
 
-send()
+	if len(sys.argv) < 2:
+		print("To run as an executable: python3 lumainput.py <3ds ip>")
+		quit()
 
+	server = sys.argv[1]
+
+	server = LumaInputServer(server)
+	server.hid_press(HIDButtons.X)
+	server.send()
+	
