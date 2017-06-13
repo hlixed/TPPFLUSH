@@ -21,9 +21,11 @@ def quick_press(button):
 
 while True:
 	btn = input(">")
-	if btn.lower() == 'b':
+	if btn.lower() == 'a':
 		quick_press(HIDButtons.A)
-	if btn.lower() == 'b':
+	if btn.lower() == 'x':
 		quick_press(HIDButtons.X)
 	if btn.lower() == 'b':
 		quick_press(HIDButtons.B)
+	if btn.lower() == 'y':
+		quick_press(HIDButtons.Y)
