@@ -8,8 +8,9 @@ if len(sys.argv) < 2:
 server = sys.argv[1]
 
 server = LumaInputServer(server)
-server.hid_press(HIDButtons.X) #to show it works
-server.send()
+time.sleep(3)
+#server.hid_press(HIDButtons.X) #to show it works
+#server.send()
 
 def quick_press(button,delay=0.3):
 	global server
@@ -27,10 +28,29 @@ def quick_cpad(button,delay=0.3):
 	server.circle_pad_set(CPAD_Commands.CPADNEUTRAL)
 	server.send()
 
+def quick_touch(x,y,delay=0.3):
+	global server
+	server.touch(x,y)
+	server.send()
+	time.sleep(delay)
+	server.clear_touch()
+	server.send()
+
 while True:
+	#Commands are things like 'a', 'touch 200 200', 'cpadneutral', 'dpadup', or 'cpadup'
 	btn = input(">").strip().upper()
 	if hasattr(HIDButtons,btn):
 		quick_press(HIDButtons[btn])
 
 	if hasattr(CPAD_Commands,btn): #don't forget CPADNEUTRAL is in here
 		quick_cpad(CPAD_Commands[btn])
+
+	if btn.startswith("TOUCH"):
+		cmd = btn.split()
+		try:
+			x = int(cmd[1])
+			y = int(cmd[2])
+			quick_touch(x,y)
+		except ValueError:
+			print("Error!")
+

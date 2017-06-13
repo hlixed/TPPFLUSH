@@ -35,9 +35,12 @@ class LumaInputServer():
 		self.socket.connect((server, port))
 
 		self.CPAD_BOUND = 0x5d0
+		self.TOUCHSCREEN_SIZES = [320,240]
 
 		self.current_pressed_buttons = HIDButtons.A ^ HIDButtons.A #no buttons
 		self.circle_pad_coords = [0,0] #0,0 is the center
+		self.touch_pressed = False
+		self.current_touch_coords = [0,0]
 
 		#button-pressing functions
 		#these do nothing until self.send() is called.
@@ -48,6 +51,16 @@ class LumaInputServer():
 	def hid_unpress(self, button):
 		if button in self.current_pressed_buttons:
 			self.current_pressed_buttons ^= button
+
+	def touch(self,x,y):
+		if x >= self.TOUCHSCREEN_SIZES[0] or y >= self.TOUCHSCREEN_SIZES[1] or x < 0 or y < 0:
+			raise ValueError
+
+		self.touch_pressed = True
+		self.current_touch_coords = [int(x),int(y)]
+
+	def clear_touch(self):
+		self.touch_pressed = False
 
 	def circle_pad_set(self, button, multiplier=1):
 		if button == CPAD_Commands.CPADUP:
@@ -68,20 +81,25 @@ class LumaInputServer():
 		self.current_pressed_buttons ^= button
 
 	def send(self):
-		circle_state = bytearray.fromhex("7ff7ff00")
 		cstick_state = bytearray.fromhex("80800081")
-		touch_state =  bytearray.fromhex("20000000")
 		special_buttons = bytearray(4)
 
 		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
 		hid_state = bytearray_not(hid_buttons)
 
+		circle_state = bytearray.fromhex("7ff7ff00")
 		if self.circle_pad_coords[0] != 0 or self.circle_pad_coords != 0: # "0x5d0 is the upper/lower bound of circle pad input", says stary2001
 			x,y = self.circle_pad_coords
 			x = ((x * self.CPAD_BOUND) // 32768) + 2048
 			y = ((y * self.CPAD_BOUND) // 32768) + 2048
 			circle_state = x | (y << 12)
-			print(circle_state)
+
+		touch_state = bytearray.fromhex("20000000")
+		if(self.touch_pressed):
+			x,y = self.current_touch_coords
+			x = (x * 4096) // self.TOUCHSCREEN_SIZES[0]
+			y = (y * 4096) // self.TOUCHSCREEN_SIZES[1]
+			touch_state = (x | (y << 12) | (0x01 << 24)).to_bytes(4,byteorder='little')
 
 		toSend = bytearray(20) #create empty byte array
 		toSend[0:4] = hid_state
@@ -93,15 +111,6 @@ class LumaInputServer():
 		self.socket.send(toSend)
 
 """
-	if(circle_x != 0 || circle_y != 0) // Do circle magic. 0x5d0 is the upper/lower bound of circle pad input
-	{
-		uint32_t x = circle_x;
-		uint32_t y = circle_y;
-		x = ((x * CPAD_BOUND) / 32768) + 2048;
-		y = ((y * CPAD_BOUND) / 32768) + 2048;
-		circle_state = x | (y << 12);
-	}
-
 	if(cstick_x != 0 || cstick_y != 0 || zlzr_state != 0)
 	{
 		double x = cstick_x / 32768.0;
@@ -114,13 +123,7 @@ class LumaInputServer():
 		cstick_state = (yy&0xff) << 24 | (xx&0xff) << 16 | (zlzr_state&0xff) << 8 | 0x81;
 	}
 
-	if(touching) // This is good enough.
-	{
-		uint32_t x = touch_x;
-		uint32_t y = touch_y;
-		x = (x * 4096) / window_w;
-		y = (y * 4096) / window_h;
-		touch_state = x | (y << 12) | (0x01 << 24);
+
 }"""
 
 if __name__ == "__main__":
@@ -133,6 +136,12 @@ if __name__ == "__main__":
 	server = sys.argv[1]
 
 	server = LumaInputServer(server)
-	server.hid_press(HIDButtons.X)
+
+	#example commands
+	server.hid_press(HIDButtons.X) # hold x
+	server.circle_pad_set(CPAD_Commands.CPADUP)
+	server.touch(319,239) #touch the bottom-right of the screen
+	
+	#send inputs to 3DS
 	server.send()
 	

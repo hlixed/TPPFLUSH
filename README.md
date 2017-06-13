@@ -4,11 +4,22 @@
 
 Luma3DS 8.0 introduced an Input Redirection feature available through the Rosalina menu (L+down+select -> Miscellaneous options... -> InputRedirection) that allows a computer to send inputs to a hacked 3DS. TPPFLUSH is a python library that allows sending inputs via this method.
 
-As it stands now, this library is a work-in-progress, and 
+As it stands now, this library is a work-in-progress.
+
+Supported inputs:
+	* ABXY, L/R, Start/Select
+	* Circle pad
+	* D-pad
+	* Touch input
+
+Not yet supported:
+	* N3DS C-Stick
+	* N3DS ZR and ZL
+	* Home and power buttons
 
 ## How do I use it in my own python application?
 
-After importing `tppflush`, Create a `LumaInputServer` with the IP of the target 3DS, then call various functions as appropriate to change the internal state, and finally call `send()` to send the input to the 3DS. *Nothing will happen unless `send()` is called!*
+After importing `tppflush`, Create a `LumaInputServer` with the IP of the target 3DS, then call various functions with the appropriate enum of the button you want as appropriate to change the internal state, and finally call `send()` to send the input to the 3DS. *Nothing will happen unless `send()` is called!*
 
 ## How do I connect this to a 3DS?
 
