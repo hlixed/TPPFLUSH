@@ -52,6 +52,14 @@ def quick_zlzr(button,delay=0.3):
 	server.n3ds_zlzr_unpress(button)
 	server.send()
 
+def quick_special(button,delay=0.3):
+	global server
+	server.special_press(button)
+	server.send()
+	time.sleep(delay)
+	server.special_unpress(button)
+	server.send()
+
 while True:
 	#Commands are things like 'a', 'touch 200 200', 'cpadneutral', 'dpadup', or 'cpadup'
 	btn = input(">").strip().upper()
@@ -75,3 +83,6 @@ while True:
 
 	if hasattr(N3DS_Buttons,btn):
 		quick_zlzr(N3DS_Buttons[btn])
+
+	if hasattr(Special_Buttons,btn):
+		quick_special(Special_Buttons[btn])

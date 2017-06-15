@@ -34,6 +34,11 @@ class N3DS_Buttons(IntFlag):
 	ZL = 2
 	ZR = 4
 
+class Special_Buttons(IntFlag):
+	HOME = auto()
+	POWER = auto()
+	POWER_LONG = auto()
+
 def bytearray_not(arr):
 	return bytearray([255-i for i in arr])
 
@@ -49,6 +54,7 @@ class LumaInputServer():
 		self.TOUCHSCREEN_SIZES = [320,240]
 
 		self.current_pressed_buttons = HIDButtons.A ^ HIDButtons.A #no buttons
+		self.current_special_buttons = Special_Buttons.HOME ^ Special_Buttons.HOME
 		self.circle_pad_coords = [0,0] #0,0 is the center
 		self.touch_pressed = False
 		self.current_touch_coords = [0,0]
@@ -86,6 +92,17 @@ class LumaInputServer():
 		self.touch_pressed = True
 		self.current_touch_coords = [int(x),int(y)]
 
+	def special_press(self, button):
+		if button not in self.current_special_buttons:
+			self.current_special_buttons |= button
+
+	def special_unpress(self, button):
+		if button in self.current_special_buttons:
+			self.current_special_buttons ^= button
+
+	def clear_special(self, button): #just in case
+		self.current_special_buttons ^= self.current_special_buttons
+
 	def clear_touch(self):
 		self.touch_pressed = False
 
@@ -117,8 +134,6 @@ class LumaInputServer():
 			self.cstick_coords = [0,0]
 
 	def send(self):
-		special_buttons = bytearray(4)
-
 		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
 		hid_state = bytearray_not(hid_buttons)
 
@@ -148,6 +163,8 @@ class LumaInputServer():
 			#rotated_x and rotated_y are between 0 and 0xff now
 
 			n3ds_exclusives_state = ((rotated_y&0xff) << 24 | (rotated_x&0xff) << 16 | (self.zlzr_state&0xff) << 8 | 0x81).to_bytes(4,byteorder='little')
+
+		special_buttons = self.current_special_buttons.to_bytes(4,byteorder='little')
 
 		toSend = bytearray(20) #create empty byte array
 		toSend[0:4] = hid_state
