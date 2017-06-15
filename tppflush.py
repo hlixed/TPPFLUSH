@@ -1,5 +1,5 @@
 import socket #imports module allowing connection to IRC
-from enum import IntFlag, auto
+from enum import IntFlag, Flag, auto
 
 
 class HIDButtons(IntFlag):
@@ -16,12 +16,19 @@ class HIDButtons(IntFlag):
 	X = auto()
 	Y = auto()
 
-class CPAD_Commands(IntFlag):
+class CPAD_Commands(Flag):
 	CPADUP = auto()
 	CPADDOWN = auto()
 	CPADLEFT	= auto()
 	CPADRIGHT = auto()
 	CPADNEUTRAL = auto() #sets cpad to 0,0
+
+class CSTICK_Commands(Flag): #N3DS c-stick
+	CSTICKUP = auto()
+	CSTICKDOWN = auto()
+	CSTICKLEFT	= auto()
+	CSTICKRIGHT = auto()
+	CSTICKNEUTRAL = auto() #sets cstick to 0,0
 
 class N3DS_Buttons(IntFlag):
 	ZL = 2
@@ -62,11 +69,11 @@ class LumaInputServer():
 		self.current_pressed_buttons ^= button
 
 	def n3ds_zlzr_press(self, button):
-		if button not in self.current_pressed_buttons:
+		if button not in self.zlzr_state:
 			self.n3ds_zlzr_toggle(button)
 
 	def n3ds_zlzr_unpress(self, button):
-		if button in self.current_pressed_buttons:
+		if button in self.zlzr_state:
 			self.n3ds_zlzr_toggle(button)
 
 	def n3ds_zlzr_toggle(self, button):
@@ -96,6 +103,18 @@ class LumaInputServer():
 
 	def circle_pad_neutral(self):
 		self.circle_pad_coords = [0,0]
+
+	def n3ds_cstick_set(self, button, multiplier=1):
+		if button == CSTICK_Commands.CSTICKUP:
+			self.cstick_coords[1] = 32767*multiplier
+		if button == CSTICK_Commands.CSTICKDOWN:
+			self.cstick_coords[1] = -32767*multiplier
+		if button == CSTICK_Commands.CSTICKLEFT:
+			self.cstick_coords[0] = -32767*multiplier
+		if button == CSTICK_Commands.CSTICKRIGHT:
+			self.cstick_coords[0] = 32767*multiplier
+		if button == CSTICK_Commands.CSTICKNEUTRAL:
+			self.cstick_coords = [0,0]
 
 	def send(self):
 		special_buttons = bytearray(4)

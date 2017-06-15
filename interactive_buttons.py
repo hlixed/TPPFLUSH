@@ -36,6 +36,22 @@ def quick_touch(x,y,delay=0.3):
 	server.clear_touch()
 	server.send()
 
+def quick_cstick(button,delay=0.3):
+	global server
+	server.n3ds_cstick_set(button)
+	server.send()
+	time.sleep(delay)
+	server.n3ds_cstick_set(CSTICK_Commands.CSTICKNEUTRAL)
+	server.send()
+
+def quick_zlzr(button,delay=0.3):
+	global server
+	server.n3ds_zlzr_press(button)
+	server.send()
+	time.sleep(delay)
+	server.n3ds_zlzr_unpress(button)
+	server.send()
+
 while True:
 	#Commands are things like 'a', 'touch 200 200', 'cpadneutral', 'dpadup', or 'cpadup'
 	btn = input(">").strip().upper()
@@ -54,3 +70,8 @@ while True:
 		except ValueError:
 			print("Error!")
 
+	if hasattr(CSTICK_Commands,btn):
+		quick_cstick(CSTICK_Commands[btn])
+
+	if hasattr(N3DS_Buttons,btn):
+		quick_zlzr(N3DS_Buttons[btn])
