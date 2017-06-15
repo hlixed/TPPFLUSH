@@ -61,8 +61,45 @@ class LumaInputServer():
 		self.cstick_coords = [0,0] #n3ds c-stick, not the circle pad
 		self.zlzr_state = N3DS_Buttons.ZL ^ N3DS_Buttons.ZL #n3ds zl and zr
 
-		#button-pressing functions
-		#these do nothing until self.send() is called.
+	#button-pressing functions
+	#these do nothing until self.send() is called.
+	def press(self, btn):
+		"""Press the given button. This function accepts any value from any of the enums defined here and will call the appropriate pressing function. Ideally, this function should be the only one you need to press a button.
+			To control the circle pad, use self.circle_pad_set() instead.
+			To control the touch screen, use self.touch() instead.
+			To control the N3DS c-stick, use self.n3ds_cstick_set() instead.
+		Example usage: 	press(Special_Buttons.HOME)
+						press(N3DS_Buttons.ZL)
+						press(HID_Buttons.A)
+		"""
+		if btn in HIDButtons:
+			self.hid_press(btn)
+		elif btn in N3DS_Buttons:
+			self.n3ds_zlzr_press(btn)
+		elif btn in Special_Buttons:
+			self.special_press(btn)
+		else:
+			raise ValueError("Invalid button!")	
+
+	def unpress(self, btn):
+		"""Unpress the given button. This is the opposite of self.press(), and will do nothing if a button is not already pressed. Ideally, this function should be the only one you need to unpress a button.
+			To control the circle pad, use self.circle_pad_set() or self.circle_pad_neutral() instead.
+			To unpress the touch screen, use self.clear_touch() instead.
+			To control the N3DS c-stick, use self.n3ds_cstick_set() self.or circle_pad_neutral() instead.
+			Special buttons can be unpressed individually with this function, but clear_special() exists to clear them all.
+		Example usage: 	unpress(Special_Buttons.HOME)
+						unpress(N3DS_Buttons.ZL)
+						unpress(HID_Buttons.A)
+		"""
+		if btn in HIDButtons:
+			self.hid_unpress(btn)
+		elif btn in N3DS_Buttons:
+			self.n3ds_zlzr_unpress(btn)
+		elif btn in Special_Buttons:
+			self.special_unpress(btn)
+		else:
+			raise ValueError("Invalid button!")
+
 	def hid_press(self, button):
 		if button not in self.current_pressed_buttons:
 			self.current_pressed_buttons |= button
@@ -119,7 +156,7 @@ class LumaInputServer():
 			self.circle_pad_coords = [0,0]
 
 	def circle_pad_neutral(self):
-		self.circle_pad_coords = [0,0]
+		self.circle_pad_set(CPAD_Commands.CPADNEUTRAL)
 
 	def n3ds_cstick_set(self, button, multiplier=1):
 		if button == CSTICK_Commands.CSTICKUP:
@@ -133,11 +170,14 @@ class LumaInputServer():
 		if button == CSTICK_Commands.CSTICKNEUTRAL:
 			self.cstick_coords = [0,0]
 
+	def n3ds_cstick_neutral(self):
+			self.n3ds_cstick_set(CSTICK_Commands.CSTICKNEUTRAL)
+
 	def send(self):
 		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
 		hid_state = bytearray_not(hid_buttons)
 
-		circle_state = bytearray.fromhex("7ff7ff00")
+		circle_state = bytearray.fromhex("00088000")
 		if self.circle_pad_coords[0] != 0 or self.circle_pad_coords[1] != 0: # "0x5d0 is the upper/lower bound of circle pad input", says stary2001
 			x,y = self.circle_pad_coords
 			x = ((x * self.CPAD_BOUND) // 32768) + 2048
