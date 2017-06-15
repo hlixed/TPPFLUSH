@@ -11,9 +11,7 @@ Supported inputs:
 * Circle pad
 * D-pad
 * Touch input
-* N3DS ZR and ZL (experimental)
-
-Not yet supported:
+* N3DS ZR and ZL
 * N3DS C-Stick
 * Home and power buttons
 
