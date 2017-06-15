@@ -11,10 +11,10 @@ Supported inputs:
 * Circle pad
 * D-pad
 * Touch input
+* N3DS ZR and ZL (experimental)
 
 Not yet supported:
 * N3DS C-Stick
-* N3DS ZR and ZL
 * Home and power buttons
 
 ## If I'm a developer, how do I use TPPFLUSH in my own python application?
