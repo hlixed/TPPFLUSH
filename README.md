@@ -4,8 +4,6 @@
 
 Luma3DS 8.0 introduced an Input Redirection feature available through the Rosalina menu (L+down+select -> Miscellaneous options... -> InputRedirection) that allows a computer to send inputs to a hacked 3DS. TPPFLUSH is a (python 3 only) library that allows any program to send inputs to a 3DS via this method, instead of going through a GUI.
 
-As it stands now, this library is a work-in-progress.
-
 Supported inputs:
 * ABXY, L/R, Start/Select
 * Circle pad
