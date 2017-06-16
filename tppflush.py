@@ -1,3 +1,5 @@
+VERSION = 1.19
+
 import socket #imports module allowing connection to IRC
 from enum import IntFlag, Flag, auto
 
@@ -173,7 +175,7 @@ class LumaInputServer():
 	def n3ds_cstick_neutral(self):
 			self.n3ds_cstick_set(CSTICK_Commands.CSTICKNEUTRAL)
 
-	def send(self):
+	def send(self, print_sent=True):
 		hid_buttons = self.current_pressed_buttons.to_bytes(4,byteorder='little')
 		hid_state = bytearray_not(hid_buttons)
 
@@ -212,24 +214,11 @@ class LumaInputServer():
 		toSend[8:12] = circle_state
 		toSend[12:16] = n3ds_exclusives_state
 		toSend[16:20] = special_buttons
-		print(toSend)
+
 		self.socket.send(toSend)
 
-"""
-	if(cstick_x != 0 || cstick_y != 0 || zlzr_state != 0)
-	{
-		double x = cstick_x / 32768.0;
-		double y = cstick_y / 32768.0;
-
-		// We have to rotate the c-stick position 45deg. Thanks, Nintendo.
-		uint32_t xx = (uint32_t)((x+y) * M_SQRT1_2 * CPP_BOUND) + 0x80;
-		uint32_t yy = (uint32_t)((y-x) * M_SQRT1_2 * CPP_BOUND) + 0x80;
-
-		n3ds_exclusives_state = (yy&0xff) << 24 | (xx&0xff) << 16 | (zlzr_state&0xff) << 8 | 0x81;
-	}
-
-
-}"""
+		if print_sent:
+			print(toSend)
 
 if __name__ == "__main__":
 	import sys
