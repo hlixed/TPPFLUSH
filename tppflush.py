@@ -1,7 +1,8 @@
-VERSION = 1.19
+VERSION = 1.20
 
 import socket #imports module allowing connection to IRC
 from enum import IntFlag, Flag, auto
+from itertools import chain
 
 
 class HIDButtons(IntFlag):
@@ -101,6 +102,15 @@ class LumaInputServer():
 			self.special_unpress(btn)
 		else:
 			raise ValueError("Invalid button!")
+
+	def clear_everything(self):
+		"""Function to reset the 3DS to no-inputs. All buttons are unpressed, the c-pad and c-stick are returned to neutral, and any touch pad inputs are cleared."""
+		for btn in chain(HIDButtons,N3DS_Buttons,Special_Buttons):
+			self.unpress(btn)
+		self.clear_touch()
+		self.circle_pad_neutral()
+		self.n3ds_cstick_neutral()
+
 
 	def hid_press(self, button):
 		if button not in self.current_pressed_buttons:
