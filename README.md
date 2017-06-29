@@ -25,9 +25,17 @@ First, find the IP of your 3DS - FTP applications are useful for figuring this o
 
 ## I'm not a developer; is this useful to me?
 
-Yes! If you want to control your 3DS from a computer, clone this repo and run `interactive_buttons.py` for a bare-bones client that works on all platforms, not just windows.
+Partially. If you want to control your 3DS from a computer, clone this repo and run `interactive_buttons.py` for a bare-bones client that works on all platforms, not just windows.
 
 As of June 12, 2017, TPPFLUSH is the only client that works for linux without requiring compiliation. 
+
+If you want to play a game in real time, `interactive_buttons.py` is probably not the right tool for the job. See the following list for some more convenient-to-use clients.
+
+## List of clients using TPPFLUSH
+
+(If a new client is created and wants to be added to this list, let me know and I'll add it here!)
+
+* MissingNO123's [GCCthing](https://github.com/MissingNO123/gcc-thing) supports controllers (but not keyboard input)
 
 ## Credits
 
