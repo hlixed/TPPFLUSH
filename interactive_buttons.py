@@ -1,8 +1,13 @@
 import sys, time
+
+if sys.version[0] == '2':
+	print("This client only works with python 3, and you're using python 2. You can download python 3 from python.org.")
+	quit()
+
 from tppflush import *
 
 if len(sys.argv) < 2:
-	print("To run as an executable: python3 lumainput.py <3ds ip>")
+	print("To run as an executable: python3 interactive_buttons.py <3ds ip>")
 	quit()
 
 server = sys.argv[1]
