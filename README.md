@@ -17,7 +17,7 @@ Supported inputs:
 
 After importing `tppflush.py`, Create a `LumaInputServer` with the IP of the target 3DS, then call various functions with the appropriate enum of the button you want as appropriate to change the internal state, and finally call `send()` to send the input to the 3DS. *Nothing will happen unless `send()` is called!*
 
-See the bottom of the library itself, `tppflush.py`, for some example commands, and interactive_buttons.py for a simple command-line program that executes inputs in real time (but works on all platforms, not just windows.)
+See `command_examples.py` for an overview of all the available commands and how they're used. See interactive_buttons.py for a simple command-line program that executes inputs in real time (on all platforms, not just windows.)
 
 ## How do I connect TPPFLUSH to a 3DS?
 
