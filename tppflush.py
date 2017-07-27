@@ -1,4 +1,4 @@
-VERSION = 1.20
+VERSION = 1.21
 
 import socket #imports module allowing connection to IRC
 from enum import IntFlag, Flag, auto
@@ -157,13 +157,13 @@ class LumaInputServer():
 
 	def circle_pad_set(self, button, multiplier=1):
 		if button == CPAD_Commands.CPADUP:
-			self.circle_pad_coords[1] = 32767*multiplier
+			self.circle_pad_coords[1] = int(32767*multiplier)
 		if button == CPAD_Commands.CPADDOWN:
-			self.circle_pad_coords[1] = -32767*multiplier
+			self.circle_pad_coords[1] = int(-32767*multiplier)
 		if button == CPAD_Commands.CPADLEFT:
-			self.circle_pad_coords[0] = -32767*multiplier
+			self.circle_pad_coords[0] = int(-32767*multiplier)
 		if button == CPAD_Commands.CPADRIGHT:
-			self.circle_pad_coords[0] = 32767*multiplier
+			self.circle_pad_coords[0] = int(32767*multiplier)
 		if button == CPAD_Commands.CPADNEUTRAL: #resets cpad
 			self.circle_pad_coords = [0,0]
 
