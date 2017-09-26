@@ -2,7 +2,7 @@
 
 ## What is it?
 
-Luma3DS 8.0 introduced an Input Redirection feature available through the Rosalina menu (L+down+select -> Miscellaneous options... -> InputRedirection) that allows a computer to send inputs to a hacked 3DS. TPPFLUSH is a (python 3 only) library that allows any program to send inputs to a 3DS via this method, instead of going through a GUI.
+Luma3DS 8.0 introduced an Input Redirection feature available through the Rosalina menu (L+down+select -> Miscellaneous options... -> InputRedirection) that allows a computer to send inputs to a hacked 3DS. TPPFLUSH is a (python >3.6 only) library that allows any program to send inputs to a 3DS via this method, instead of going through a GUI.
 
 Supported inputs:
 * ABXY, L/R, Start/Select
@@ -12,6 +12,8 @@ Supported inputs:
 * N3DS ZR and ZL
 * N3DS C-Stick
 * Home and power buttons
+
+Python 3.6 or greater is required to use TPPFLUSH. If a lesser version is detected, TPPFLUSH will raise an ImportError.
 
 ## If I'm a developer, how do I use TPPFLUSH in my own python application?
 
@@ -35,7 +37,7 @@ If you want to play a game in real time, `interactive_buttons.py` is probably no
 
 (If a new client is created and wants to be added to this list, let me know and I'll add it here!)
 
-* MissingNO123's [GCCthing](https://github.com/MissingNO123/gcc-thing) supports controllers (but not keyboard input)
+* MissingNO123's [GCCthing](https://github.com/MissingNO123/gcc-thing) supports controllers
 
 ## Credits
 

@@ -38,12 +38,12 @@ server.send(print_sent=False)
 time.sleep(0.5)
 
 #Multiple buttons can be pressed at once.
-time.sleep(0.5)
 server.press(HIDButtons.L)
 server.press(HIDButtons.R)
 server.press(HIDButtons.START)
 server.press(N3DS_Buttons.ZL) #If an o3DS is connected, this function will do nothing.
 server.send(print_sent=False)
+time.sleep(0.5)
 
 #You can also release all buttons at once.
 server.clear_everything()

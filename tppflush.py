@@ -1,9 +1,12 @@
-VERSION = 1.21
+VERSION = 1.22
+
+import sys
+if sys.version_info[0] < 3 or sys.version_info[1] < 6:
+    raise ImportError("You are using python {}.{}. Python 3.6 or greater is required to use TPPFLUSH.\nYou can download the latest version of python from http://www.python.org.\n".format(sys.version_info[0],sys.version_info[1]))
 
 import socket #imports module allowing connection to IRC
-from enum import IntFlag, Flag, auto
 from itertools import chain
-
+from enum import IntFlag, Flag, auto #Python 3.6 is required for this import
 
 class HIDButtons(IntFlag):
 	A = auto()
