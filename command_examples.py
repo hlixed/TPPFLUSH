@@ -102,4 +102,7 @@ server.send(print_sent=False)
 #server.press(Special_Buttons.POWER) #as if you tapped the power button
 #server.press(Special_Buttons.POWER_LONG) #as if you held down the power button
 
+# Return control to physical buttons
+server.return_control()
+
 #Hope this helps!
