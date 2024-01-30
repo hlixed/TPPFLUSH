@@ -233,6 +233,9 @@ class LumaInputServer():
 		if print_sent:
 			print(toSend)
 
+	def return_control(self):
+            self.socket.send(bytearray.fromhex("ff0f000000000002fff77f008100808000000000"))
+
 if __name__ == "__main__":
 	import sys
 
@@ -251,4 +254,7 @@ if __name__ == "__main__":
 	
 	#send inputs to 3DS
 	server.send()
+
+	#return control to physical buttons
+	server.return_control()
 	
